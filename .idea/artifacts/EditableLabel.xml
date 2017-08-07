@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="EditableLabel">
+    <output-path>$PROJECT_DIR$/out/artifacts/EditableLabel</output-path>
+    <root id="archive" name="EditableLabel.jar">
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/fr/antoinecoupat/fxprojects/fxcompolib/editablelabel/EditableLabel.java" />
+      <element id="directory" name="fxml">
+        <element id="directory" name="editablelabel">
+          <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/fr/antoinecoupat/fxprojects/fxcompolib/editablelabel/fxcompolib/fxml/editablelabel/EditableLabel.fxml" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
