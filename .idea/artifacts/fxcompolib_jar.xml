@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="fxcompolib:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/fxcompolib_jar</output-path>
-    <root id="archive" name="fxcompolib.jar">
-      <element id="module-output" name="fxcompolib" />
-    </root>
-  </artifact>
-</component>
