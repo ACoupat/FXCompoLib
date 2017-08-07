@@ -37,7 +37,7 @@ public class EditableLabel extends AnchorPane implements Initializable {
         try{
 
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(this.getClass().getClassLoader().getResource("fr/antoinecoupat/fxprojects/fxcompolib/editablelabel/fxcompolib/fxml/editablelabel/EditableLabel.fxml"));
+            loader.setLocation(this.getClass().getClassLoader().getResource("fr/antoinecoupat/fxprojects/fxcompolib/fxml/editablelabel/EditableLabel.fxml"));
             loader.setRoot(this);
             loader.setController(this);
             loader.setClassLoader(getClass().getClassLoader());
