@@ -1,27 +1,33 @@
 package fr.antoinecoupat.fxprojects.fxcompolib.imagegallery;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Polyline;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -48,8 +54,22 @@ public class ImageGallery extends AnchorPane implements Initializable {
     @FXML
     private HBox imageContainer;
 
+    @FXML
+    private Button addImageButton;
+
+    @FXML
+    private Label placeHolder;
+
+
+    private BooleanProperty displayAddButton = new SimpleBooleanProperty(true);
 
     private ObservableList<Image> imageList = FXCollections.observableArrayList();
+
+    private ObservableList<ImageView> thumbnailList = FXCollections.observableArrayList();
+
+    private ObservableList<ImageGalleryAddListener> addListeners = FXCollections.observableArrayList();
+
+    private ObservableList<ImageGalleryRemoveListener> removeListeners = FXCollections.observableArrayList();
 
     /**
      * Index of the image currently displayed
@@ -78,39 +98,46 @@ public class ImageGallery extends AnchorPane implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         this.currentImage.setPreserveRatio(true);
+        this.addImageButton.visibleProperty().bind(this.displayAddButton);
 
         Platform.runLater(()->{
             this.currentImage.fitHeightProperty().bind(this.imageContainer.heightProperty());
         });
 
-
-
-
         this.rightArrow.setOnMouseClicked(event->{
 
-            int nbImages = this.imageList.size();
-            int newIndex = (this.currentIndex + 1) % nbImages;
-            System.out.println(newIndex);
-            this.currentImage.setImage(this.imageList.get(newIndex));
-            this.currentIndex = newIndex;
+            selectNext();
 
         });
 
         this.leftArrow.setOnMouseClicked(event->{
 
-            int nbImages = this.imageList.size();
-            int newIndex;
-            if(this.currentIndex == 0){
-                newIndex = nbImages - 1;
-            }else{
-                newIndex = (this.currentIndex - 1);
-            }
-
-            System.out.println(newIndex);
-            this.currentImage.setImage(this.imageList.get(newIndex));
-            this.currentIndex = newIndex;
+            selectPrevious();
 
         });
+
+        this.addImageButton.setOnAction(event -> {
+
+            FileChooser chooser = new FileChooser();
+            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Fichiers Images","*.jpg","*.png","*.gif");
+            chooser.getExtensionFilters().add(filter);
+
+            File selectedImageFile = chooser.showOpenDialog(this.getScene().getWindow());
+
+            if(selectedImageFile != null){
+
+                addImage(new Image(selectedImageFile.toURI().toString()));
+                fireImageAddedEvent(selectedImageFile);
+
+            }
+
+
+        });
+
+        this.imageList.addListener((ListChangeListener) (c->{
+            setArrowsVisible(imageList.size() > 1 );
+            setPlaceHolderVisible(imageList.size() == 0);
+        }));
 
         //Setting the window to maximize the image on the screen
         this.currentImage.setOnMouseClicked(event->{
@@ -144,6 +171,7 @@ public class ImageGallery extends AnchorPane implements Initializable {
             });
 
             maximizeStage.setScene(scene);
+            maximizeStage.initModality(Modality.APPLICATION_MODAL);
 
             maximizeStage.show();
 
@@ -151,31 +179,136 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
     }
 
+    private void setPlaceHolderVisible(boolean value) {
 
-    public void setImages(Iterable<Image> images){
+        this.currentImage.setVisible(!value);
+        this.currentImage.setManaged(!value);
 
-        this.imageList.clear();
-        for(Image image : images){
-            this.imageList.add(image);
-            System.out.println("image");
-            ImageView thumbnail = new ImageView(image);
-            thumbnail.setPreserveRatio(true);
-            thumbnail.setFitHeight(85);
-            this.thumbnailSlot.getChildren().add(thumbnail);
-
-            thumbnail.setOnMouseClicked(event->{
-
-                Image selectedImage = thumbnail.getImage();
-                this.currentIndex = this.imageList.indexOf(selectedImage);
-                this.currentImage.setImage(selectedImage);
-
-            });
-        }
-        this.currentImage.setImage(this.imageList.get(0));
+        this.placeHolder.setVisible(value);
+        this.placeHolder.setManaged(value);
 
     }
 
+    private void setArrowsVisible(boolean value) {
+        this.leftArrow.setVisible(value);
+        this.rightArrow.setVisible(value);
+    }
 
+    private void selectPrevious(){
+        int nbImages = this.imageList.size();
+        int newIndex;
+        if(this.currentIndex == 0){
+            newIndex = nbImages - 1;
+        }else{
+            newIndex = (this.currentIndex - 1);
+        }
+
+        System.out.println(newIndex);
+        this.currentImage.setImage(this.imageList.get(newIndex));
+        this.currentIndex = newIndex;
+    }
+
+    private void selectNext(){
+
+        int nbImages = this.imageList.size();
+        int newIndex = (this.currentIndex + 1) % nbImages;
+        this.currentImage.setImage(this.imageList.get(newIndex));
+        this.currentIndex = newIndex;
+    }
+
+    public void setImages(List<Image> images){
+        this.imageList.clear();
+        if(images.size() > 0){
+            for(Image image : images){
+                addImage(image);
+            }
+            this.currentImage.setImage(this.imageList.get(0));
+        }
+    }
+
+    private void addImage(Image image){
+
+        this.imageList.add(image);
+        ImageView thumbnail = new ImageView(image);
+        thumbnail.setPreserveRatio(true);
+        thumbnail.setFitHeight(85);
+        this.thumbnailSlot.getChildren().add(thumbnail);
+        this.thumbnailList.add(thumbnail);
+
+        thumbnail.setOnMouseClicked(event->{
+
+            if(event.getButton() == MouseButton.PRIMARY) {
+                Image selectedImage = thumbnail.getImage();
+                this.currentIndex = this.imageList.indexOf(selectedImage);
+                this.currentImage.setImage(selectedImage);
+            }
+            else if(event.getButton() == MouseButton.SECONDARY){
+
+                ContextMenu menu = new ContextMenu();
+                MenuItem deleteItem = new MenuItem("Supprimer");
+                deleteItem.setOnAction(actionEvent->{
+                    removeImage(this.thumbnailList.indexOf(thumbnail));
+                });
+                menu.getItems().add(deleteItem);
+                menu.show(thumbnail, event.getSceneX(), event.getSceneY());
+                System.out.println("là");
+            }
+        });
+
+    }
+
+    private void removeImage(int index){
+
+        this.thumbnailSlot.getChildren().remove(this.thumbnailList.get(index));
+        if(this.imageList.size() > 1){
+            this.selectNext();
+        }
+        Image removedImage = this.imageList.get(index);
+        this.imageList.remove(removedImage);
+        fireImageRemovedEvent(removedImage);
+
+    }
+
+    public boolean isDisplayAddButton() {
+        return displayAddButton.get();
+    }
+
+    public BooleanProperty displayAddButtonProperty() {
+        return displayAddButton;
+    }
+
+    public void setDisplayAddButton(boolean displayAddButton) {
+        this.displayAddButton.set(displayAddButton);
+    }
+
+    //Listeners Management
+    public void addAddListener(ImageGalleryAddListener listener){
+        this.addListeners.add(listener);
+    }
+
+    public void removeAddListener(ImageGalleryAddListener listener){
+        this.addListeners.remove(listener);
+    }
+
+    public void addRemoveListener(ImageGalleryRemoveListener listener){
+        this.removeListeners.add(listener);
+    }
+
+    public void removeRemoveListener(ImageGalleryRemoveListener listener){
+        this.removeListeners.remove(listener);
+    }
+
+    public void fireImageAddedEvent(File imageFile){
+        for(ImageGalleryAddListener listener : this.addListeners){
+            listener.imageAdded(imageFile);
+        }
+    }
+
+    public void fireImageRemovedEvent(Image image){
+        for(ImageGalleryRemoveListener listener : this.removeListeners){
+            listener.imageRemoved(image);
+        }
+    }
 
 }
 

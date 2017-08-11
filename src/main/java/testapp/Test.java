@@ -28,7 +28,19 @@ public class Test extends Application{
 
         AnchorPane root = new AnchorPane();
 
-        EditableLabel label = new EditableLabel();
+        //Test Image storage
+        File imgFile = new File("D:/Images/Autres/photo profil facebookCharlie.png");
+
+        byte[] bytes = TestImageDb.fileToBytes(imgFile);
+
+        Image img = TestImageDb.bytesToImage(bytes);
+
+        ImageView imgv = new ImageView(img);
+
+        root.getChildren().add(imgv);
+
+
+       /* EditableLabel label = new EditableLabel();
         root.getChildren().add(label);
 
         ImageGallery gallery = new ImageGallery();
@@ -47,7 +59,7 @@ public class Test extends Application{
 
         gallery.setImages(imageList);
 
-        root.getChildren().add(gallery);
+        root.getChildren().add(gallery);*/
 
         Scene scene = new Scene(root);
 
