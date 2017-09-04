@@ -100,9 +100,8 @@ public class ImageGallery extends AnchorPane implements Initializable {
         this.currentImage.setPreserveRatio(true);
         this.addImageButton.visibleProperty().bind(this.displayAddButton);
 
-        Platform.runLater(()->{
-            this.currentImage.fitHeightProperty().bind(this.imageContainer.heightProperty());
-        });
+
+        this.currentImage.fitHeightProperty().bind(this.imageContainer.heightProperty());
 
         this.rightArrow.setOnMouseClicked(event->{
 

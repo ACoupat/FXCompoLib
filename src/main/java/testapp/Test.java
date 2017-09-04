@@ -1,7 +1,7 @@
 package testapp;
 
-import fr.antoinecoupat.fxprojects.fxcompolib.editablelabel.EditableLabel;
-import fr.antoinecoupat.fxprojects.fxcompolib.imagegallery.ImageGallery;
+import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editabledatepicker.EditableDatePicker;
+import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablelabel.EditableLabel;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -10,8 +10,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Antoine on 07/08/2017.
@@ -37,13 +35,13 @@ public class Test extends Application{
 
         ImageView imgv = new ImageView(img);
 
-        root.getChildren().add(imgv);
+       // root.getChildren().add(imgv);
 
 
        /* EditableLabel label = new EditableLabel();
-        root.getChildren().add(label);
+        root.getChildren().add(label);*/
 
-        ImageGallery gallery = new ImageGallery();
+       /* ImageGallery gallery = new ImageGallery();
         List<Image> imageList = new ArrayList<>();
         File imageDir = new File("D:/Images/Autres");
         File[] filesList = imageDir.listFiles();
@@ -57,11 +55,18 @@ public class Test extends Application{
         }
 
 
-        gallery.setImages(imageList);
+        gallery.setImages(imageList);*/
 
-        root.getChildren().add(gallery);*/
+        //root.getChildren().add(gallery);
 
-        Scene scene = new Scene(root);
+        EditableLabel label = new EditableLabel();
+
+        EditableDatePicker dp = new EditableDatePicker();
+
+        Scene scene = new Scene(root,400,400);
+        root.getChildren().add(label);
+        root.getChildren().add(dp);
+        dp.setTranslateX(200);
 
         primaryStage.setScene(scene);
 
