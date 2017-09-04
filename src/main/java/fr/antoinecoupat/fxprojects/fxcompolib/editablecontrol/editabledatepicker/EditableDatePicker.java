@@ -5,48 +5,77 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.util.converter.LocalDateStringConverter;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
 
 /**
  * Created by Antoine on 31/08/2017.
  */
-public class EditableDatePicker extends EditableControl implements Initializable {
+public class EditableDatePicker extends EditableControl{
 
-    private ObjectProperty<LocalDate> date = new SimpleObjectProperty<>(LocalDate.now());
+    private ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
 
+    /**
+     * DatePicker used as an editor
+     */
     private DatePicker editorDp = new DatePicker();
 
-    private ObjectProperty<DateFormat> dateFormat = new SimpleObjectProperty<DateFormat>(new SimpleDateFormat("dd/MM/yyyy"));
+    //TODO Manage several date formats
 
+    /**
+     * Creates a new EditableDatePicker
+     */
     public EditableDatePicker() {
-
+        super();
         this.editorNode = editorDp;
 
-        this.dateFormat.addListener((obs, ov, nv)->{
-            formatDateToLabel();
-        });
+        LocalDate startDate = LocalDate.now();
 
+        this.date.set(startDate);
+        this.editorDp.setValue(startDate);
+
+        formatDateToLabel();
     }
 
+    /**
+     * If the value of the DatePicker is valid, it is
+     * set as the value of the component and the label
+     * is displayed. If it is not valid the old value is
+     * kept.
+     */
     @Override
     protected void validateValue() {
-        this.date.set(editorDp.getValue());
-        formatDateToLabel();
-        showLabel();
+        LocalDate newValue = editorDp.getValue();
+        if(newValue != null){
+            this.date.set(editorDp.getValue());
+            formatDateToLabel();
+            //showLabel();
+        }else{
+            discardValue();
+        }
+
     }
 
+    /**
+     * Sets the last valid value as the value
+     * of the component and displays the label
+     */
     @Override
     protected void discardValue() {
-        showLabel();
+        this.editorDp.setValue(this.date.get());
+        //showLabel();
     }
 
+    /**
+     * Converts the date value of the component
+     * to a String and displays it in the label
+     */
     private void formatDateToLabel(){
-        this.label.setText(dateFormat.get().format(this.date.get().toEpochDay()));
+
+        LocalDateStringConverter converter = new LocalDateStringConverter();
+        this.textProperty().set(converter.toString(this.date.get()));
     }
 
     //Getters & Setters
@@ -62,15 +91,5 @@ public class EditableDatePicker extends EditableControl implements Initializable
         this.date.set(date);
     }
 
-    public DateFormat getDateFormat() {
-        return dateFormat.get();
-    }
 
-    public ObjectProperty<DateFormat> dateFormatProperty() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(DateFormat dateFormat) {
-        this.dateFormat.set(dateFormat);
-    }
 }

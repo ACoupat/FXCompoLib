@@ -13,49 +13,43 @@ import java.util.ResourceBundle;
 /**
  * Created by Antoine on 07/08/2017.
  */
-public class EditableLabel extends EditableControl implements Initializable {
+public class EditableLabel extends EditableControl{
 
     /**
      * The textfield that will be used as an editor
      */
     private TextField editorTf = new TextField();
 
-    /**
-     * The effective text managed by the component
-     */
-    private StringProperty text = new SimpleStringProperty("EditableLabel");
-
-
-    private boolean validateFlag = false;
-
-    public EditableLabel() {
+    public EditableLabel(String text) {
 
         this.editorTf = new TextField();
         this.editorNode = editorTf;
+        this.textProperty().set(text);
+    }
+
+    public EditableLabel(){
+        this("Label");
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources){
         super.initialize(location,resources);
         Platform.runLater(()->{
             showLabel();
-            this.label.textProperty().bindBidirectional(this.textProperty());
             this.editorTf.textProperty().bindBidirectional(this.textProperty());
         });
-
-
     }
 
     @Override
     protected void validateValue() {
-        this.label.setText(this.editorTf.getText());
-        showLabel();
+        this.textProperty().set(this.editorTf.getText());
+       // showLabel();
     }
 
     @Override
     protected void discardValue() {
         this.editorTf.setText(this.label.getText());
-        showLabel();
+       // showLabel();
     }
 
     @Override

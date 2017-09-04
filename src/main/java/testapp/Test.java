@@ -2,6 +2,7 @@ package testapp;
 
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editabledatepicker.EditableDatePicker;
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablelabel.EditableLabel;
+import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablespinner.EditableSpinner;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -59,14 +60,18 @@ public class Test extends Application{
 
         //root.getChildren().add(gallery);
 
-        EditableLabel label = new EditableLabel();
+        EditableLabel label = new EditableLabel("Labeleuh");
 
         EditableDatePicker dp = new EditableDatePicker();
+
+        EditableSpinner sp = new EditableSpinner();
 
         Scene scene = new Scene(root,400,400);
         root.getChildren().add(label);
         root.getChildren().add(dp);
+        root.getChildren().add(sp);
         dp.setTranslateX(200);
+        sp.setTranslateY(100);
 
         primaryStage.setScene(scene);
 

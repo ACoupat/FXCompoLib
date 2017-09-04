@@ -28,9 +28,9 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
     protected Label label;
 
     /**
-     * The effective text managed by the component
+     * The text property that is displayed when the label is visible
      */
-    private StringProperty text = new SimpleStringProperty("EditableLabele");
+    private StringProperty text = new SimpleStringProperty("");
 
     protected Node editorNode;
 
@@ -67,7 +67,6 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
             this.label.textProperty().bindBidirectional(this.textProperty());
 
             this.label.setOnMouseClicked(event->{
-                System.out.println("lol");
                 if(event.getClickCount() == 2){
                     showEditor();
                 }
@@ -77,9 +76,11 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
             this.editorNode.setOnKeyPressed(event->{
                 if(event.getCode() == KeyCode.ENTER){
                     validateValue();
+                    showLabel();
                 }
                 if(event.getCode() == KeyCode.ESCAPE){
                     discardValue();
+                    showLabel();
                 }
             });
 
