@@ -15,11 +15,9 @@ import java.util.regex.Pattern;
 /**
  * Created by Antoine on 04/09/2017.
  */
-public class EditableSpinner extends EditableControl{
+public class EditableSpinner extends EditableControl<Double>{
 
     private Spinner<Double> editorSp = new Spinner<>();
-
-    private DoubleProperty value = new SimpleDoubleProperty(0);
 
     private boolean integers = false;
 
@@ -30,7 +28,7 @@ public class EditableSpinner extends EditableControl{
         this.editorSp.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(min,max,value,step));
         this.editorSp.setEditable(true);
         this.integers = integers;
-        this.textProperty().set(this.editorSp.getValue().toString());
+        this.text.set(this.editorSp.getValue().toString());
 
         //Dispatching the event to the handler in the super class
         this.editorSp.getEditor().setOnKeyPressed(event->{
@@ -54,27 +52,34 @@ public class EditableSpinner extends EditableControl{
             this.value.set(Double.parseDouble(this.editorSp.getEditor().getText()));
         }
         else{
-            String valueToSet = (integers) ? Integer.toString(this.value.intValue()) : Double.toString(this.value.doubleValue());
+            String valueToSet = (integers) ? Integer.toString(this.value.get().intValue()) : Double.toString(this.value.get().doubleValue()); //TODO simplify
             this.editorSp.getEditor().setText(valueToSet);
         }
-        formatNumberToLabel();
+        formatValueToLabel();
     }
 
     @Override
     protected void discardValue() {
         this.editorSp.getValueFactory().setValue(this.value.get());
-        formatNumberToLabel();
+        formatValueToLabel();
     }
 
-    private void formatNumberToLabel(){ //TODO factorize ?
-
+    @Override
+    protected void formatValueToLabel() {
         String textToDisplay = "";
         if(integers){
-            textToDisplay = Integer.toString(this.value.intValue());
+            textToDisplay = Integer.toString(this.value.get().intValue());
         }else{
-            textToDisplay = Double.toString((this.value.doubleValue()));
+            textToDisplay = Double.toString(this.value.get().doubleValue());
         }
-        this.textProperty().set(textToDisplay);
+        this.text.set(textToDisplay);
+    }
+
+    @Override
+    public void setValue(Double value) {
+        super.setValue(value);
+        this.editorSp.getValueFactory().setValue(value);
+        formatValueToLabel();
     }
 
     /**
@@ -85,11 +90,15 @@ public class EditableSpinner extends EditableControl{
 
         String regex ="";
         if(this.integers){
-            regex = "^\\d+$"; //TODO regex
+            regex = "^\\d+$";
         }else{
-            regex = "-?\\d+(.\\d+)?"; //TODO regex
+            regex = "-?\\d+(.\\d+)?";
         }
         return Pattern.matches(regex, this.editorSp.getEditor().getText());
 
+    }
+
+    private Double getRightVersionOfValue(){
+        return integers ? value.get().intValue() : value.get().doubleValue();
     }
 }

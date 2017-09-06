@@ -1,8 +1,7 @@
 package fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,7 +17,7 @@ import java.util.ResourceBundle;
 /**
  * Created by Antoine on 31/08/2017.
  */
-public abstract class EditableControl extends AnchorPane implements Initializable {
+public abstract class EditableControl<T> extends AnchorPane implements Initializable {
 
 
     @FXML
@@ -30,7 +29,12 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
     /**
      * The text property that is displayed when the label is visible
      */
-    private StringProperty text = new SimpleStringProperty("");
+    protected StringProperty text = new SimpleStringProperty("");
+
+     /**
+     * The property that handles the value managed by the component
+     */
+    protected ObjectProperty<T> value = new SimpleObjectProperty<T>();
 
     protected Node editorNode;
 
@@ -64,7 +68,7 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
             AnchorPane.setTopAnchor(this.editorNode,0D);
 
 
-            this.label.textProperty().bindBidirectional(this.textProperty());
+            this.label.textProperty().bind(this.textProperty());
 
             this.label.setOnMouseClicked(event->{
                 if(event.getClickCount() == 2){
@@ -112,6 +116,12 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
     protected abstract void discardValue();
 
     /**
+     * Override this method to convert the value to a string
+     * and display it in the label
+     */
+    protected abstract void formatValueToLabel();
+
+    /**
      * Shows/Hides the editor/label according to the boolean parameter
      * Override this method to add extra behaviour such as text selection etc...
      * @param value if true the editor will be displayed and the label will be hidden
@@ -128,11 +138,26 @@ public abstract class EditableControl extends AnchorPane implements Initializabl
         return text.get();
     }
 
-    public StringProperty textProperty() {
+    public ReadOnlyStringProperty textProperty() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text.set(text);
+    //Getters & Setters
+
+    public T getValue() {
+        return value.get();
     }
+
+    public ReadOnlyObjectProperty<T> valueProperty() {
+        return value;
+    }
+
+    /**
+     * Override this method to change the value of the editor node
+     * @param value
+     */
+    public void setValue(T value){
+        this.value.set(value);
+    };
+
 }
