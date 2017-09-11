@@ -77,6 +77,14 @@ public abstract class EditableControl<T> extends AnchorPane implements Initializ
 
             });
 
+            this.editorNode.focusedProperty().addListener((obs,ov,nv)->{
+                if(!nv){
+                    validateValue();
+                    showLabel();
+                }
+
+            });
+
             this.editorNode.setOnKeyPressed(event->{
                 if(event.getCode() == KeyCode.ENTER){
                     validateValue();

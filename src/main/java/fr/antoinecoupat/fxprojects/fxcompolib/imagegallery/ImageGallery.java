@@ -125,8 +125,9 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
             if(selectedImageFile != null){
 
+                Image newImage = new Image(selectedImageFile.toURI().toString());
                 addImage(new Image(selectedImageFile.toURI().toString()));
-                fireImageAddedEvent(selectedImageFile);
+                fireImageAddedEvent(selectedImageFile,newImage);
 
             }
 
@@ -297,9 +298,9 @@ public class ImageGallery extends AnchorPane implements Initializable {
         this.removeListeners.remove(listener);
     }
 
-    public void fireImageAddedEvent(File imageFile){
+    public void fireImageAddedEvent(File imageFile, Image image){
         for(ImageGalleryAddListener listener : this.addListeners){
-            listener.imageAdded(imageFile);
+            listener.imageAdded(imageFile, image);
         }
     }
 

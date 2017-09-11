@@ -9,5 +9,5 @@ import java.io.File;
  */
 public interface ImageGalleryAddListener {
 
-    public void imageAdded(File imagefile);
+    public void imageAdded(File imageFile, Image image);
 }

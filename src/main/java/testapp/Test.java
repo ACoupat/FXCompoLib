@@ -4,6 +4,7 @@ import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editabledatepicker
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablelabel.EditableLabel;
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablespinner.EditableSpinner;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,7 +27,7 @@ public class Test extends Application{
     public void start(Stage primaryStage) throws Exception {
 
         AnchorPane root = new AnchorPane();
-
+        root.setPadding(new Insets(50,50,50,50));
         //Test Image storage
         File imgFile = new File("D:/Images/Autres/photo profil facebookCharlie.png");
 
@@ -60,7 +61,7 @@ public class Test extends Application{
 
         //root.getChildren().add(gallery);
 
-        EditableLabel label = new EditableLabel("Labeleuh");
+        EditableLabel label = new EditableLabel("Text");
 
         EditableDatePicker dp = new EditableDatePicker();
 
@@ -70,8 +71,15 @@ public class Test extends Application{
         root.getChildren().add(label);
         root.getChildren().add(dp);
         root.getChildren().add(sp);
+
         dp.setTranslateX(200);
+        dp.setTranslateY(200);
+
+        sp.setTranslateX(100);
         sp.setTranslateY(100);
+
+        label.setTranslateX(300);
+        label.setTranslateY(300);
 
         primaryStage.setScene(scene);
 
