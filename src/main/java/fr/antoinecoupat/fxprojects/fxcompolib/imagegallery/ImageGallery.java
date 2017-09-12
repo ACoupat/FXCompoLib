@@ -250,7 +250,7 @@ public class ImageGallery extends AnchorPane implements Initializable {
                     removeImage(this.thumbnailList.indexOf(thumbnail));
                 });
                 menu.getItems().add(deleteItem);
-                menu.show(thumbnail, event.getSceneX(), event.getSceneY());
+                menu.show(thumbnail, event.getScreenX(), event.getScreenY());
                 System.out.println("là");
             }
         });
