@@ -49,6 +49,8 @@ public abstract class EditableControl<T> extends AnchorPane implements Initializ
             loader.setController(this);
             loader.setClassLoader(getClass().getClassLoader());
             loader.load();
+            getStyleClass().add("editable-control");
+            getStylesheets().add("fr/antoinecoupat/fxprojects/fxcompolib/css/style.css");
         } catch (IOException e) {
             e.printStackTrace();
         }

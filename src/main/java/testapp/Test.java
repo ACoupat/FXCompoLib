@@ -3,6 +3,7 @@ package testapp;
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editabledatepicker.EditableDatePicker;
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablelabel.EditableLabel;
 import fr.antoinecoupat.fxprojects.fxcompolib.editablecontrol.editablespinner.EditableSpinner;
+import fr.antoinecoupat.fxprojects.fxcompolib.imagegallery.ImageGallery;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -12,6 +13,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Antoine on 07/08/2017.
@@ -43,12 +46,12 @@ public class Test extends Application{
        /* EditableLabel label = new EditableLabel();
         root.getChildren().add(label);*/
 
-       /* ImageGallery gallery = new ImageGallery();
+        ImageGallery gallery = new ImageGallery();
         List<Image> imageList = new ArrayList<>();
         File imageDir = new File("D:/Images/Autres");
         File[] filesList = imageDir.listFiles();
 
-        for(File file : filesList){
+       for(File file : filesList){
 
             if(file.getName().endsWith(".jpg") ||
                     file.getName().endsWith(".png")){
@@ -57,18 +60,19 @@ public class Test extends Application{
         }
 
 
-        gallery.setImages(imageList);*/
+        gallery.setImages(imageList);
 
-        //root.getChildren().add(gallery);
+        root.getChildren().add(gallery);
 
-        EditableLabel label = new EditableLabel("Text");
+       /* EditableLabel label = new EditableLabel("Text");
 
         EditableDatePicker dp = new EditableDatePicker();
 
-        EditableSpinner sp = new EditableSpinner();
+        EditableSpinner sp = new EditableSpinner();*/
 
         Scene scene = new Scene(root,400,400);
-        root.getChildren().add(label);
+
+        /*root.getChildren().add(label);
         root.getChildren().add(dp);
         root.getChildren().add(sp);
 
@@ -79,10 +83,11 @@ public class Test extends Application{
         sp.setTranslateY(100);
 
         label.setTranslateX(300);
-        label.setTranslateY(300);
+        label.setTranslateY(300);*/
 
         primaryStage.setScene(scene);
-
+        primaryStage.setHeight(800);
+        primaryStage.setWidth(800);
         //ScenicView.show(scene);
 
         primaryStage.show();

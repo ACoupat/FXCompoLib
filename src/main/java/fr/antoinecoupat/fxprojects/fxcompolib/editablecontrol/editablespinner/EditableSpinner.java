@@ -21,11 +21,16 @@ public class EditableSpinner extends EditableControl<Double>{
 
     private boolean integers = false;
 
+    private Double min, max;
+
 
     public EditableSpinner(double min, double max, double step, double value, boolean integers) {
 
         this.editorNode = this.editorSp;
         this.editorSp.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(min,max,value,step));
+        this.min = min;
+        this.max = max;
+        this.value.set(value);
         this.editorSp.setEditable(true);
         this.integers = integers;
         this.text.set(this.editorSp.getValue().toString());
@@ -100,5 +105,15 @@ public class EditableSpinner extends EditableControl<Double>{
 
     private Double getRightVersionOfValue(){
         return integers ? value.get().intValue() : value.get().doubleValue();
+    }
+
+    public void setIntegers(boolean integers){
+        this.integers = true;
+        if(integers){
+            this.editorSp.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(min,max,value.get(),1));
+        }else{
+            this.editorSp.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(min,max,value.get(),1));
+        }
+
     }
 }

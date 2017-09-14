@@ -9,11 +9,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -35,15 +34,14 @@ import java.util.ResourceBundle;
  */
 public class ImageGallery extends AnchorPane implements Initializable {
 
+    @FXML
+    private Button leftArrow;
 
     @FXML
-    private Polyline leftArrow;
+    private Button rightArrow;
 
     @FXML
     private ImageView currentImage;
-
-    @FXML
-    private Polyline rightArrow;
 
     @FXML
     private Label titleLabel;
@@ -59,6 +57,9 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
     @FXML
     private Label placeHolder;
+
+    @FXML
+    private ScrollPane scrollThumbnails;
 
 
     private BooleanProperty displayAddButton = new SimpleBooleanProperty(true);
@@ -99,17 +100,18 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
         this.currentImage.setPreserveRatio(true);
         this.addImageButton.visibleProperty().bind(this.displayAddButton);
-
+        setArrowsVisible(false);
+        setPlaceHolderVisible(true);
 
         this.currentImage.fitHeightProperty().bind(this.imageContainer.heightProperty());
 
-        this.rightArrow.setOnMouseClicked(event->{
+        this.rightArrow.setOnAction(event->{
 
             selectNext();
 
         });
 
-        this.leftArrow.setOnMouseClicked(event->{
+        this.leftArrow.setOnAction(event->{
 
             selectPrevious();
 
@@ -121,16 +123,17 @@ public class ImageGallery extends AnchorPane implements Initializable {
             FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Fichiers Images","*.jpg","*.png","*.gif");
             chooser.getExtensionFilters().add(filter);
 
-            File selectedImageFile = chooser.showOpenDialog(this.getScene().getWindow());
+            List<File> selectedImageFiles = chooser.showOpenMultipleDialog(this.getScene().getWindow());
 
-            if(selectedImageFile != null){
+            if(selectedImageFiles != null && selectedImageFiles.size() != 0){
 
-                Image newImage = new Image(selectedImageFile.toURI().toString());
-                addImage(new Image(selectedImageFile.toURI().toString()));
-                fireImageAddedEvent(selectedImageFile,newImage);
-
+                for (File selectedImageFile : selectedImageFiles) {
+                    Image newImage = new Image(selectedImageFile.toURI().toString());
+                    addImage(new Image(selectedImageFile.toURI().toString()));
+                    fireImageAddedEvent(selectedImageFile,newImage);
+                }
             }
-
+            selectLast();
 
         });
 
@@ -179,6 +182,29 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
     }
 
+    /**
+     * Highlights the thumbnail corresponding to the current
+     * image that is displayed on top
+     */
+    private void highlightThumbnail(){
+
+        this.thumbnailList.get(this.currentIndex).setEffect(new DropShadow());
+    }
+
+    /**
+     * Resets the thumbnail highlighting of the current image
+     */
+    private void resetThumbnail(){
+
+        this.thumbnailList.get(this.currentIndex).setEffect(null);
+    }
+
+
+
+    /**
+     * Hides/Shows the placeholder that replaces the ImageView
+     * @param value
+     */
     private void setPlaceHolderVisible(boolean value) {
 
         this.currentImage.setVisible(!value);
@@ -189,11 +215,19 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
     }
 
+    /**
+     * Hides/Shows the arrows
+     * @param value
+     */
     private void setArrowsVisible(boolean value) {
         this.leftArrow.setVisible(value);
         this.rightArrow.setVisible(value);
     }
 
+    /**
+     * Selects the previous image in the list and displays it
+     * in the top view.
+     */
     private void selectPrevious(){
         int nbImages = this.imageList.size();
         int newIndex;
@@ -203,17 +237,62 @@ public class ImageGallery extends AnchorPane implements Initializable {
             newIndex = (this.currentIndex - 1);
         }
 
-        System.out.println(newIndex);
         this.currentImage.setImage(this.imageList.get(newIndex));
+        resetThumbnail();
         this.currentIndex = newIndex;
+        changeHighlighting(newIndex);
     }
 
+    /**
+     * Selects the next image in the list and displays it
+     * in the top view.
+     */
     private void selectNext(){
 
         int nbImages = this.imageList.size();
         int newIndex = (this.currentIndex + 1) % nbImages;
         this.currentImage.setImage(this.imageList.get(newIndex));
+        changeHighlighting(newIndex);
+    }
+
+    /**
+     * Selects the last image in the list and displays it
+     * in the top view.
+     */
+    private void selectLast(){
+        int nbImages = this.imageList.size();
+        this.currentImage.setImage(this.imageList.get(nbImages - 1));
+        changeHighlighting(nbImages - 1);
+    }
+
+    /**
+     * Removes the highlighting on the current thumbnail
+     * and highlights another
+     * @param newIndex index of the new thumbnail to highlight
+     */
+    private void changeHighlighting(int newIndex){
+        resetThumbnail();
         this.currentIndex = newIndex;
+        highlightThumbnail();
+        adjustView();
+    }
+
+    /**
+     * Changes the position of the scroll pane to position
+     * the current thumbnail in the center of the view
+     */
+    private void adjustView(){
+
+        Node concernedThumbnail = this.thumbnailSlot.getChildren().get(this.currentIndex);
+        double leftX = concernedThumbnail.getBoundsInParent().getMinX();
+        double scrollRatio = leftX / (this.thumbnailSlot.getBoundsInParent().getWidth() -
+                this.thumbnailSlot.getPadding().getLeft() -
+                this.thumbnailSlot.getPadding().getRight() -
+                this.thumbnailSlot.getChildren().get(this.thumbnailSlot.getChildren().size()-1).getBoundsInParent().getWidth()
+        );
+
+        this.scrollThumbnails.setHvalue(scrollRatio);
+        
     }
 
     public void setImages(List<Image> images){
@@ -239,7 +318,7 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
             if(event.getButton() == MouseButton.PRIMARY) {
                 Image selectedImage = thumbnail.getImage();
-                this.currentIndex = this.imageList.indexOf(selectedImage);
+                changeHighlighting(this.imageList.indexOf(selectedImage));
                 this.currentImage.setImage(selectedImage);
             }
             else if(event.getButton() == MouseButton.SECONDARY){
@@ -251,7 +330,6 @@ public class ImageGallery extends AnchorPane implements Initializable {
                 });
                 menu.getItems().add(deleteItem);
                 menu.show(thumbnail, event.getScreenX(), event.getScreenY());
-                System.out.println("là");
             }
         });
 
@@ -259,10 +337,17 @@ public class ImageGallery extends AnchorPane implements Initializable {
 
     private void removeImage(int index){
 
-        this.thumbnailSlot.getChildren().remove(this.thumbnailList.get(index));
-        if(this.imageList.size() > 1){
-            this.selectNext();
+        //If the image that will be deleted is currently displayed
+        if(currentIndex == index){
+            if(this.imageList.size() > 1){
+
+                this.selectNext();
+                this.currentIndex --;
+            }
         }
+        this.thumbnailSlot.getChildren().remove(this.thumbnailList.get(index));
+        this.thumbnailList.remove(index);
+
         Image removedImage = this.imageList.get(index);
         this.imageList.remove(removedImage);
         fireImageRemovedEvent(removedImage);
